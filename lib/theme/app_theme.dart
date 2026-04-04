@@ -106,7 +106,7 @@ class AppTheme {
         bodyLarge: TextStyle(color: Colors.white, fontSize: 16),
         bodyMedium: TextStyle(color: textSecondary, fontSize: 14),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: cardColor,
         elevation: 4,
         shape: RoundedRectangleBorder(
