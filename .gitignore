@@ -1,0 +1,34 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android
+android/
+*.apk
+*.aab
+
+# iOS
+ios/
+*.ipa
+
+# macOS
+macos/
+
+# Windows
+windows/
+
+# Linux
+linux/
+
+# Web
+web/
+
+# IDE
+.idea/
+.vscode/
+*.iml
