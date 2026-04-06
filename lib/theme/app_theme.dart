@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Neon green accent color
   static const Color neonGreen = Color(0xFF39FF14);
   static const Color darkBackground = Color(0xFF0A0A0A);
   static const Color surfaceColor = Color(0xFF1A1A1A);
