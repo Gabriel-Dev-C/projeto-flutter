@@ -1,4 +1,4 @@
-# Let´s Exercise (README RASCUNHO)
+# FitStart (README RASCUNHO)
 
 Aplicativo Flutter voltado para iniciantes que desejam construir habitos fitness com consistencia. O projeto apresenta uma experiencia simples e direta, com autenticacao simulada, painel inicial e uma secao educativa com dicas praticas para treino, alimentacao, hidratacao e descanso.
 
