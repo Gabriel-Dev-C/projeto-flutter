@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_flutter/theme/app_theme.dart';
+import 'package:projeto_flutter/database/db_helper.dart'; // IMPORTANTE: Verifique se o caminho está correto
 import 'login_screen.dart';
 import 'saiba_mais_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  // Função auxiliar para buscar o nome no banco sem mexer no login
+  Future<String> _fetchUserName() async {
+    try {
+      // Buscamos o último usuário que entrou no banco
+      return await DbHelper().getLastName();
+    } catch (e) {
+      return "Usuário"; // Fallback caso dê algum erro
+    }
+  }
 
   void _handleLogoff(BuildContext context) {
     showDialog<void>(
@@ -67,7 +78,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Welcome banner
+            // Welcome banner AJUSTADO COM FUTUREBUILDER
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -75,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                 color: AppTheme.surfaceColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppTheme.neonGreen.withOpacity(0.5),
+                  color: AppTheme.neonGreen.withOpacity(0.3),
                   width: 1,
                 ),
               ),
@@ -100,19 +111,27 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Bem-vindo(a)!',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Pronto para mais um treino?',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                    child: FutureBuilder<String>(
+                      future: _fetchUserName(), // Busca o nome no banco
+                      builder: (context, snapshot) {
+                        // Enquanto carrega mostra "...", depois mostra o nome
+                        String name = snapshot.data ?? "...";
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Bem-vindo(a), $name!',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Pronto para mais um treino?',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ],

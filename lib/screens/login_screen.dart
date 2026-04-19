@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_flutter/theme/app_theme.dart';
 import 'home_screen.dart';
+import 'register_user_screen.dart';
+import 'package:projeto_flutter/database/db_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,15 +30,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    // Simulate a short loading delay
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
+    // 1. CONSULTAR O BANCO (Ação de leitura do CRUD)
+    bool loginSucesso = await DbHelper().checkLogin(
+      _emailController.text,
+      _passwordController.text,
+    );
 
     setState(() => _isLoading = false);
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    if (loginSucesso) {
+      // Se o banco retornou true, vai pra Home
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } else {
+      // Se não encontrou no banco, avisa o erro
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('E-mail ou senha não cadastrados!')),
+      );
+    }
+  }
+
+  void _navigateToRegister() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const RegisterUserScreen()),
     );
   }
 
@@ -46,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -150,19 +167,42 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Login button
                       _isLoading
                           ? const CircularProgressIndicator(
-                            color: AppTheme.neonGreen,
-                          )
+                              color: AppTheme.neonGreen,
+                            )
                           : ElevatedButton.icon(
-                            onPressed: _handleLogin,
-                            icon: const Icon(Icons.login),
-                            label: const Text('ENTRAR'),
-                          ),
+                              onPressed: _handleLogin,
+                              icon: const Icon(Icons.login),
+                              label: const Text('ENTRAR'),
+                            ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+      // --- BOTÃO DE REGISTRO FIXO NO RODAPÉ ---
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Não tem uma conta?',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+            TextButton(
+              onPressed: _navigateToRegister,
+              child: const Text(
+                'Cadastre-se',
+                style: TextStyle(
+                  color: AppTheme.neonGreen,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
