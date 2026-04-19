@@ -67,4 +67,17 @@ class DbHelper {
     Database db = await database;
     return await db.delete('users', where: 'id = ?', whereArgs: [id]);
   }
+
+  // 1. UPDATE: Para alterar o nome do usuário
+  Future<int> updateUserName(String newName) async {
+    final db = await database;
+    // Aqui pegamos o primeiro usuário para simplificar,
+    // ou você pode passar o ID se tiver mais de um.
+    return await db.update(
+      'users',
+      {'name': newName}, // Coluna 'name' deve ser a mesma do seu banco
+      where: 'id = ?',
+      whereArgs: [1],
+    );
+  }
 }
