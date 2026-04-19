@@ -12,21 +12,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // --- ESTADO E NAVEGAÇÃO ---
+  // --- CONTROLE DE ESTADO E NAVEGAÇÃO ---
   int _currentIndex = 0;
   final ValueNotifier<String> _userNameNotifier = ValueNotifier<String>("...");
 
-  // --- FRASE MOTIVACIONAL ---
+  // --- LÓGICA DA FRASE (TÓXICA) ---
   final List<String> _frases = [
-    "Sabe onde ela está agora?!!",
-    "Vai fazer o minímo? igual ela fez por você?!!",
-    "Críticar é facil, dificíl é te elogiar.",
+    "Sabe onde ela tá agora?!!",
+    "Vai fazer o mínimo? igual ela fez por você?!!",
+    "Criticar é fácil, difícil é te elogiar.",
+    "Enquanto você perde tempo lendo isso, tem nego ocupado com ela!!",
   ];
   String _fraseDoDia = "";
 
-  // --- ÁGUA E HÁBITOS ---
+  // --- LÓGICA DA ÁGUA ---
   int _mlConsumidos = 0;
   final int _metaAgua = 2000;
+
   final Map<String, bool> _habitsChecked = {
     'Treino na academia': false,
     'Alimentação saudável': false,
@@ -45,16 +47,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _userNameNotifier.value = name;
   }
 
-  // --- CÁLCULO DE XP (PONTOS REAIS) ---
   int _calculateCurrentXP() {
     int habitXP = _habitsChecked.values.where((v) => v).length * 100;
     int waterXP = (_mlConsumidos >= _metaAgua) ? 100 : 0;
     return habitXP + waterXP;
   }
 
-  int _calculateTotalPossibleXP() => (_habitsChecked.length + 1) * 100;
-
-  // --- FUNÇÕES CRUD (PERFIL) ---
+  // --- CRUD: UPDATE (EDITAR NOME) ---
   void _showEditNameDialog() {
     final controller = TextEditingController(text: _userNameNotifier.value);
     showDialog(
@@ -91,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // --- CRUD: DELETE (EXCLUIR CONTA) ---
   void _showDeleteDialog() {
     showDialog(
       context: context,
@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Excluir Conta',
             style: TextStyle(color: Colors.redAccent)),
         content:
-            const Text('Ação irreversível. Deseja apagar todos os seus dados?'),
+            const Text('Esta ação é irreversível. Deseja apagar seus dados?'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () async {
-              await DbHelper().deleteUser(1); // Exclui o ID 1 do SQLite
+              await DbHelper().deleteUser(1); // Exclui ID 1
               if (!mounted) return;
               Navigator.pop(ctx);
               Navigator.of(context).pushAndRemoveUntil(
@@ -124,8 +124,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int currentXP = _calculateCurrentXP();
+    int totalXP = (_habitsChecked.length + 1) * 100;
+
     final List<Widget> _screens = [
-      _buildHomeContent(),
+      _buildHomeContent(currentXP, totalXP),
       const Center(
           child: Text("Treinos",
               style: TextStyle(color: AppTheme.neonGreen, fontSize: 18))),
@@ -134,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FitStart'),
+        title: Text(_currentIndex == 2 ? 'Meu Perfil' : 'FitStart'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -160,10 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- CONTEÚDO DA HOME ---
-  Widget _buildHomeContent() {
-    int currentXP = _calculateCurrentXP();
-    int totalXP = _calculateTotalPossibleXP();
+  // --- ABA 0: HOME ---
+  Widget _buildHomeContent(int currentXP, int totalXP) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
@@ -172,14 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _buildWelcomeBanner(currentXP, totalXP)),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(25, 12, 25, 0),
-            child: Text("\"$_fraseDoDia\"",
-                style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 13)),
-          ),
+          _buildQuoteCard(),
           const SizedBox(height: 24),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -193,20 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold))),
           const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: _habitsChecked.keys
-                  .map((title) => _buildHabitCarouselItem(
-                        title: title,
-                        isChecked: _habitsChecked[title]!,
-                        onTap: () => setState(() =>
-                            _habitsChecked[title] = !_habitsChecked[title]!),
-                      ))
-                  .toList(),
-            ),
-          ),
+          _buildHabitCarousel(),
           const SizedBox(height: 32),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -233,14 +214,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- CONTEÚDO DO PERFIL (AQUI ESTÁ O QUE FALTAVA) ---
+  // --- ABA 2: PERFIL (ESTILIZADA COM CRUD) ---
   Widget _buildProfileContent() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           const SizedBox(height: 20),
-          // Avatar com borda neon
           Center(
             child: Container(
               padding: const EdgeInsets.all(4),
@@ -248,74 +228,66 @@ class _HomeScreenState extends State<HomeScreen> {
                   shape: BoxShape.circle,
                   border: Border.all(color: AppTheme.neonGreen, width: 2)),
               child: const CircleAvatar(
-                  radius: 55,
+                  radius: 50,
                   backgroundColor: AppTheme.cardColor,
                   child:
-                      Icon(Icons.person, size: 65, color: AppTheme.neonGreen)),
+                      Icon(Icons.person, size: 60, color: AppTheme.neonGreen)),
             ),
           ),
           const SizedBox(height: 30),
-          // Info Tile com ValueNotifier para atualizar o nome em tempo real
           ValueListenableBuilder(
             valueListenable: _userNameNotifier,
-            builder: (context, name, _) =>
-                _buildProfileInfoCard("Usuário FitStart", name, Icons.badge),
+            builder: (context, name, _) => _buildInfoTile(
+                label: "Nome de Usuário", value: name, icon: Icons.badge),
           ),
           const SizedBox(height: 40),
-          // Botões do CRUD
           _buildActionCard(
-            title: "Editar Dados",
-            desc: "Alterar o seu nome no sistema",
-            icon: Icons.edit,
-            color: Colors.orangeAccent,
-            onTap: _showEditNameDialog,
-          ),
+              title: "Editar Dados",
+              desc: "Atualizar seu nome no banco",
+              icon: Icons.edit,
+              color: Colors.orangeAccent,
+              onTap: _showEditNameDialog),
           const SizedBox(height: 16),
           _buildActionCard(
-            title: "Excluir Conta",
-            desc: "Remover permanentemente os seus dados",
-            icon: Icons.delete_forever,
-            color: Colors.redAccent,
-            onTap: _showDeleteDialog,
-          ),
+              title: "Excluir Conta",
+              desc: "Remover dados permanentemente",
+              icon: Icons.delete_forever,
+              color: Colors.redAccent,
+              onTap: _showDeleteDialog),
         ],
       ),
     );
   }
 
-  // --- WIDGETS AUXILIARES (MODULARIZADOS) ---
+  // --- WIDGETS AUXILIARES ---
 
-  Widget _buildWelcomeBanner(int currentXP, int totalXP) {
+  Widget _buildQuoteCard() {
     return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
           color: AppTheme.surfaceColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.neonGreen.withOpacity(0.3))),
-      child: Column(children: [
-        Row(children: [
-          const CircleAvatar(
-              backgroundColor: AppTheme.cardColor,
-              child: Icon(Icons.bolt, color: AppTheme.neonGreen)),
-          const SizedBox(width: 12),
-          Expanded(
-              child: ValueListenableBuilder(
-                  valueListenable: _userNameNotifier,
-                  builder: (context, name, _) => Text('E aí, $name!',
-                      style: Theme.of(context).textTheme.titleLarge))),
+          border: Border.all(color: AppTheme.neonGreen.withOpacity(0.1))),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.warning_amber_rounded,
+              color: AppTheme.neonGreen, size: 16),
+          SizedBox(width: 8),
+          Text("AVISO DE FOCO",
+              style: TextStyle(
+                  color: AppTheme.neonGreen,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2)),
         ]),
-        const SizedBox(height: 20),
-        LinearProgressIndicator(
-            value: currentXP / totalXP,
-            backgroundColor: Colors.white10,
-            color: AppTheme.neonGreen,
-            minHeight: 10),
-        const SizedBox(height: 8),
-        Align(
-            alignment: Alignment.centerRight,
-            child: Text("$currentXP / $totalXP XP",
-                style: const TextStyle(
-                    color: AppTheme.neonGreen, fontWeight: FontWeight.bold))),
+        const SizedBox(height: 10),
+        Text("\"$_fraseDoDia\"",
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontStyle: FontStyle.italic)),
       ]),
     );
   }
@@ -339,7 +311,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.blueAccent,
                   fontWeight: FontWeight.bold,
                   fontSize: 12)),
-          const SizedBox(height: 4),
           LinearProgressIndicator(
               value: aguaPercent > 1.0 ? 1.0 : aguaPercent,
               backgroundColor: Colors.white10,
@@ -358,9 +329,129 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProfileInfoCard(String label, String value, IconData icon) {
+  Widget _buildHabitCarousel() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+          children: _habitsChecked.keys
+              .map((title) => Container(
+                    width: 220,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Card(
+                      color: _habitsChecked[title]!
+                          ? AppTheme.neonGreen.withOpacity(0.05)
+                          : AppTheme.surfaceColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                              color: _habitsChecked[title]!
+                                  ? AppTheme.neonGreen
+                                  : Colors.white10)),
+                      child: ListTile(
+                        onTap: () => setState(() =>
+                            _habitsChecked[title] = !_habitsChecked[title]!),
+                        title: Text(title,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12)),
+                        trailing: Icon(
+                            _habitsChecked[title]!
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
+                            color: _habitsChecked[title]!
+                                ? AppTheme.neonGreen
+                                : AppTheme.textSecondary),
+                      ),
+                    ),
+                  ))
+              .toList()),
+    );
+  }
+
+  Widget _buildWelcomeBanner(int cur, int tot) {
     return Container(
-      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.neonGreen.withOpacity(0.3))),
+      child: Column(children: [
+        Row(children: [
+          const CircleAvatar(
+              backgroundColor: AppTheme.cardColor,
+              child: Icon(Icons.bolt, color: AppTheme.neonGreen)),
+          const SizedBox(width: 12),
+          Expanded(
+              child: ValueListenableBuilder(
+                  valueListenable: _userNameNotifier,
+                  builder: (context, name, _) => Text('E aí, $name!',
+                      style: Theme.of(context).textTheme.titleLarge))),
+        ]),
+        const SizedBox(height: 20),
+        LinearProgressIndicator(
+            value: cur / tot,
+            backgroundColor: Colors.white10,
+            color: AppTheme.neonGreen,
+            minHeight: 10),
+        const SizedBox(height: 8),
+        Align(
+            alignment: Alignment.centerRight,
+            child: Text("$cur / $tot XP",
+                style: const TextStyle(
+                    color: AppTheme.neonGreen, fontWeight: FontWeight.bold))),
+      ]),
+    );
+  }
+
+  Widget _buildStatCard(
+      {required IconData icon, required String value, required String label}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.neonGreen.withOpacity(0.1))),
+      child: Column(children: [
+        Icon(icon, color: AppTheme.neonGreen, size: 28),
+        Text(value,
+            style: const TextStyle(
+                color: AppTheme.neonGreen,
+                fontSize: 22,
+                fontWeight: FontWeight.bold)),
+        Text(label,
+            style:
+                const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+      ]),
+    );
+  }
+
+  Widget _buildActionCard(
+      {required String title,
+      required String desc,
+      required IconData icon,
+      required Color color,
+      required VoidCallback onTap}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.3))),
+      child: ListTile(
+          onTap: onTap,
+          leading: Icon(icon, color: color),
+          title: Text(title,
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold)),
+          subtitle: Text(desc,
+              style: const TextStyle(
+                  color: AppTheme.textSecondary, fontSize: 12))),
+    );
+  }
+
+  Widget _buildInfoTile(
+      {required String label, required String value, required IconData icon}) {
+    return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
           color: AppTheme.surfaceColor,
@@ -376,82 +467,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(value,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold)),
         ]),
-      ]),
-    );
-  }
-
-  Widget _buildActionCard(
-      {required String title,
-      required String desc,
-      required IconData icon,
-      required Color color,
-      required VoidCallback onTap}) {
-    return Container(
-      decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.3))),
-      child: ListTile(
-          onTap: onTap,
-          leading: Icon(icon, color: color, size: 28),
-          title: Text(title,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold)),
-          subtitle: Text(desc,
-              style: const TextStyle(
-                  color: AppTheme.textSecondary, fontSize: 12))),
-    );
-  }
-
-  Widget _buildHabitCarouselItem(
-      {required String title,
-      required bool isChecked,
-      required VoidCallback onTap}) {
-    return Container(
-      width: 240,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      child: Card(
-        color: isChecked
-            ? AppTheme.neonGreen.withOpacity(0.05)
-            : AppTheme.surfaceColor,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(
-                color: isChecked ? AppTheme.neonGreen : Colors.white10)),
-        child: ListTile(
-          onTap: onTap,
-          title: Text(title,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  decoration: isChecked ? TextDecoration.lineThrough : null)),
-          trailing: Icon(isChecked ? Icons.check_circle : Icons.circle_outlined,
-              color: isChecked ? AppTheme.neonGreen : AppTheme.textSecondary),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(
-      {required IconData icon, required String value, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18),
-      decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(16)),
-      child: Column(children: [
-        Icon(icon, color: AppTheme.neonGreen, size: 28),
-        Text(value,
-            style: const TextStyle(
-                color: AppTheme.neonGreen,
-                fontSize: 22,
-                fontWeight: FontWeight.bold)),
-        Text(label,
-            style:
-                const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
       ]),
     );
   }
