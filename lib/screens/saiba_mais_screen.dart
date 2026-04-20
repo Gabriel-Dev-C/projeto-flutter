@@ -83,8 +83,7 @@ class SaibaMaisScreen extends StatelessWidget {
               context,
               icon: Icons.water_drop,
               title: 'Hidratação',
-              description:
-                  'Beba pelo menos 2 litros de água por dia. '
+              description: 'Beba pelo menos 2 litros de água por dia. '
                   'Durante os treinos, mantenha-se hidratado para garantir melhor desempenho.',
             ),
             const SizedBox(height: 14),
@@ -103,8 +102,7 @@ class SaibaMaisScreen extends StatelessWidget {
               context,
               icon: Icons.trending_up,
               title: 'Acompanhe seu progresso',
-              description:
-                  'Registre seus treinos, peso e medidas. '
+              description: 'Registre seus treinos, peso e medidas. '
                   'Ver a evolução ao longo do tempo é o maior motivador para continuar.',
             ),
             const SizedBox(height: 28),
