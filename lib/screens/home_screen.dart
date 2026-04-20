@@ -53,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return habitXP + waterXP;
   }
 
-  // --- CRUD: UPDATE (EDITAR NOME) ---
   void _showEditNameDialog() {
     final controller = TextEditingController(text: _userNameNotifier.value);
     showDialog(
