@@ -159,7 +159,7 @@ class SaibaMaisScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppTheme.neonGreen.withOpacity(0.12),
+                color: AppTheme.neonGreen.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: AppTheme.neonGreen, size: 26),

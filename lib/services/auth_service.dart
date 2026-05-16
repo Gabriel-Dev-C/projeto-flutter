@@ -7,14 +7,14 @@ class AuthService {
 
   Future<String?> login(String email, String password) async {
     try {
-      print("Fazendo requisição de teste para provar consumo de API...");
+      ("Fazendo requisição de teste para provar consumo de API...");
 
       final response = await http.get(Uri.parse(_testUrl));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("CONEXÃO ESTABELECIDA COM SUCESSO!");
-        print("DADO RECEBIDO DA API: ${data['title']}");
+        ("CONEXÃO ESTABELECIDA COM SUCESSO!");
+        ("DADO RECEBIDO DA API: ${data['title']}");
 
         // Retornamos um token fictício para o app navegar,
         // já que provamos que o 'http.get' funcionou.
@@ -22,7 +22,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print("ERRO DE REDE: $e");
+      ("ERRO DE REDE: $e");
       return null;
     }
   }

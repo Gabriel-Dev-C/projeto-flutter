@@ -50,7 +50,9 @@ void main() {
     testWidgets('HomeScreen shows navigation buttons',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: HomeScreen()),
+        const MaterialApp(
+          home: HomeScreen(userEmail: 'teste@fitstart.com'),
+        ),
       );
       expect(find.text('SAIBA MAIS'), findsOneWidget);
       expect(find.text('SAIR DA CONTA'), findsOneWidget);
@@ -59,7 +61,9 @@ void main() {
     testWidgets('HomeScreen navigates to SaibaMaisScreen on button press',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: HomeScreen()),
+        const MaterialApp(
+          home: HomeScreen(userEmail: 'teste@fitstart.com'),
+        ),
       );
       await tester.tap(find.text('SAIBA MAIS'));
       await tester.pumpAndSettle();
@@ -79,13 +83,14 @@ void main() {
     testWidgets('HomeScreen logoff dialog shows when logout icon is tapped',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: HomeScreen()),
+        const MaterialApp(
+          home: HomeScreen(userEmail: 'teste@fitstart.com'),
+        ),
       );
       await tester.tap(find.byIcon(Icons.logout).first);
       await tester.pumpAndSettle();
       expect(find.text('Sair'), findsOneWidget);
-      expect(
-          find.text('Deseja realmente sair da sua conta?'), findsOneWidget);
+      expect(find.text('Deseja realmente sair da sua conta?'), findsOneWidget);
     });
   });
 }
