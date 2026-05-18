@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_flutter/theme/app_theme.dart';
 import 'package:projeto_flutter/database/db_helper.dart';
-import 'package:projeto_flutter/services/auth_service.dart'; // Certifique-se de criar este arquivo
+import 'package:projeto_flutter/services/auth_service.dart';
+import '../models/user_model.dart'; // Garanta que o caminho para o seu User model está correto
 import 'home_screen.dart';
 import 'register_user_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,53 +28,95 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // --- LÓGICA DE LOGIN COM JWT (CHECKPOINT 1) ---
+  // --- LÓGICA DE LOGIN COM JWT E VALIDAÇÃO LOCAL SINCRONIZADA ---
+  // --- LÓGICA DE LOGIN COM JWT E VALIDAÇÃO LOCAL SINCRONIZADA ---
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
+      String emailDigitado = _emailController.text.trim().toLowerCase();
+      String senhaDigitada = _passwordController.text;
+
       // 1. TENTA AUTENTICAÇÃO JWT (API EXTERNA)
-      // Dica para teste: e-mail "eve.holt@reqres.in" funciona sempre nesta API
       String? token = await AuthService().login(
-        _emailController.text,
-        _passwordController.text,
+        emailDigitado,
+        senhaDigitada,
       );
 
+      // 🔥 TRAVA DE SEGURANÇA MÁXIMA CONTRA A API MOCK QUE ACEITA QUALQUER COISA:
+      if (emailDigitado == "eve.holt@reqres.in") {
+        // Se for o e-mail da API, a senha precisa ser a correta dela
+        if (senhaDigitada != "cityslick") {
+          token = null;
+        }
+      } else {
+        // 🔥 O PULO DO GATO: Se for QUALQUER outro e-mail (ex: matheus@teste.com),
+        // nós desconsideramos o token falso da API para forçar a validação real no SQLite!
+        token = null;
+      }
+
       if (token != null) {
-        // SUCESSO NO JWT
+        // --- CASO A: SUCESSO EXCLUSIVO NA API EXTERNA ---
         debugPrint("---------------------------------");
         debugPrint("TOKEN JWT RECEBIDO: $token");
         debugPrint("---------------------------------");
 
+        String nomeDoBanco = await DbHelper().getUserNameByEmail(emailDigitado);
+
+        if (nomeDoBanco == "Recruta") {
+          String nomeGerado = emailDigitado.split('@')[0];
+
+          await DbHelper().insertUser(User(
+            name: nomeGerado,
+            email: emailDigitado,
+            password: senhaDigitada,
+          ));
+          debugPrint("Usuário da API registrado no SQLite como: $nomeGerado");
+        }
+
+        // 💾 GRAVA A SESSÃO PARA O LOGIN AUTOMÁTICO
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_email', emailDigitado);
+
         if (mounted) {
           setState(() => _isLoading = false);
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            MaterialPageRoute(
+              builder: (_) => HomeScreen(userEmail: emailDigitado),
+            ),
           );
         }
       } else {
-        // 2. SE FALHAR NA API, TENTA NO BANCO LOCAL (SQLITE)
-        // Isso garante que seus usuários cadastrados offline ainda entrem
+        // --- CASO B: VALIDAÇÃO REAL E RÍGIDA NO SQLITE LOCAL ---
+        debugPrint("Verificando credenciais no SQLite local...");
+
         bool loginLocalSucesso = await DbHelper().checkLogin(
-          _emailController.text,
-          _passwordController.text,
+          emailDigitado,
+          senhaDigitada,
         );
 
         setState(() => _isLoading = false);
 
         if (loginLocalSucesso) {
+          // 💾 GRAVA A SESSÃO PARA O LOGIN AUTOMÁTICO NO LOGIN LOCAL TAMBÉM
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('user_email', emailDigitado);
+
           if (mounted) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              MaterialPageRoute(
+                builder: (_) => HomeScreen(userEmail: emailDigitado),
+              ),
             );
           }
         } else {
+          // ❌ SE NÃO PASSAR NO BANCO LOCAL, BLOQUEIA DE VERDADE!
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('E-mail ou senha inválidos (API & Local)!'),
+                content: Text('E-mail ou senha inválidos!'),
                 backgroundColor: Colors.redAccent,
               ),
             );
@@ -111,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: AppTheme.surfaceColor,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.neonGreen.withOpacity(0.2),
+                        color: AppTheme.neonGreen.withValues(alpha: 0.2),
                         blurRadius: 15,
                         spreadRadius: 2,
                       )

@@ -23,10 +23,19 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    // Validação básica
+    // Validação de campos vazios
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Preencha todos os campos!')),
+      );
+      return;
+    }
+
+    // --- NOVA VALIDAÇÃO: MÍNIMO 6 CARACTERES ---
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('A senha deve ter no mínimo 6 caracteres!')),
       );
       return;
     }
@@ -38,23 +47,21 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
       return;
     }
 
-    // 1. Criar o objeto User
+    // Objeto User e inserção no banco continuam iguais...
     User novoUsuario = User(
       name: name,
       email: email,
       password: password,
     );
 
-    // 2. MANDAR PRO BANCO REAL
     await DbHelper().insertUser(novoUsuario);
 
-    // 3. Feedback e Navegação
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Usuário cadastrado com sucesso!')),
     );
 
-    Navigator.pop(context); // Volta para a tela de Login
+    Navigator.pop(context);
   }
 
   @override
