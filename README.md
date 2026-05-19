@@ -163,4 +163,4 @@ Se quiser contribuir, siga este fluxo:
 1. Crie uma branch para a sua mudança.
 2. Faça a implementação com a menor alteração necessária.
 3. Rode `flutter analyze` e `flutter test`.
-4. Abra um pull request com uma descrição objetiva do que mudou.
+4. Abra um pull request com uma descrição objetiva do foi alterado.
