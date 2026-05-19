@@ -27,7 +27,7 @@ A interface segue um tema escuro com destaque em verde neon, priorizando contras
 - Registro do histórico do coach em arquivo local
 - Tela `Saiba Mais` com dicas práticas para iniciantes
 
-## Fluxo do aplicativo
+## Fluxo do aplicativo 
 
 1. O app abre na tela de login.
 2. O usuário pode entrar com uma conta já cadastrada ou criar um novo cadastro.
