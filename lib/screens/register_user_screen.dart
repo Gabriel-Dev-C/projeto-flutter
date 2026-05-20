@@ -122,7 +122,7 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
             ),
             const SizedBox(height: 32),
 
-            // Botão Salvar CORRIGIDO
+            // Botão Salvar
             ElevatedButton(
               onPressed: _register,
               child: const Text('CRIAR CONTA'),

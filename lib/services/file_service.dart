@@ -21,7 +21,7 @@ class FileService {
       String tempo, String feedback, String userName) async {
     final file = await _localFile(userName);
 
-    ("💾 Gravando no Filesystem do usuário $userName: ${file.path}");
+    ("Gravando no Filesystem do usuário $userName: ${file.path}");
 
     final dataAtual = DateTime.now().toString().substring(0, 19);
 
@@ -30,7 +30,7 @@ class FileService {
       mode: FileMode.append,
     );
 
-    ("✅ Upgrade registrado com sucesso para $userName.");
+    (" Upgrade registrado com sucesso para $userName.");
   }
 
   // Adicionado parâmetro userName
@@ -52,7 +52,7 @@ class FileService {
     final file = await _localFile(userName);
     if (await file.exists()) {
       await file.delete();
-      ("🗑️ Log de $userName deletado.");
+      (" Log de $userName deletado.");
     }
   }
 }

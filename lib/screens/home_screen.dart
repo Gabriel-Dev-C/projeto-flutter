@@ -464,14 +464,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pop(ctx); // Fecha o pop-up
 
               try {
-                //  1. CORRIGIDO: Passando o e-mail dinâmico em vez do número 1
+                //    Passando o e-mail dinâmico em vez do número 1
                 await DbHelper().deleteUser(widget.userEmail);
 
-                //  2. ADICIONADO: Limpa a memória do celular para travar o login automático
+                //   Limpa a memória do celular para travar o login automático
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.remove('user_email');
 
-                // 3. Redireciona para a tela de login limpando o histórico
+                //  Redireciona para a tela de login limpando o histórico
                 if (mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Row(children: [
           CircleAvatar(
             backgroundColor: AppTheme.cardColor,
-            // 🔥 BLINDAGEM: Proteção igual na renderização do topo da Home
+            // BLINDAGEM: Proteção igual na renderização do topo da Home
             backgroundImage: (_fotoPerfilPath != null &&
                     _fotoPerfilPath!.isNotEmpty &&
                     File(_fotoPerfilPath!).existsSync())
