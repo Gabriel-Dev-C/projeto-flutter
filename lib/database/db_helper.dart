@@ -28,14 +28,14 @@ class DbHelper {
             name TEXT,
             email TEXT,
             password TEXT,
-            profile_photo TEXT -- 🔥 Coluna para novos bancos de dados
+            profile_photo TEXT --
           )
         ''');
       },
     );
   }
 
-  // --- 🔥 NOVO MÉTODO: BUSCA DADOS COMPLETOS (INCLUINDO A FOTO) PELO EMAIL ---
+  //  BUSCA DADOS COMPLETOS  PELO EMAIL ---
   Future<Map<String, dynamic>?> getUserDataByEmail(String email) async {
     Database db = await database;
     List<Map<String, dynamic>> result = await db.query(
@@ -47,7 +47,7 @@ class DbHelper {
     return result.isNotEmpty ? result.first : null;
   }
 
-  // --- 🔥 NOVO MÉTODO: ATUALIZA O CAMINHO DA FOTO DE PERFIL ---
+  // ATUALIZA O CAMINHO DA FOTO DE PERFIL ---
   Future<int> updateUserPhoto(String email, String photoPath) async {
     final db = await database;
 
@@ -65,7 +65,7 @@ class DbHelper {
     );
   }
 
-  // --- BUSCA NOME PELO EMAIL (Usado nas validações rápidas) ---
+  
   Future<String> getUserNameByEmail(String email) async {
     Database db = await database;
     List<Map<String, dynamic>> result = await db.query(
@@ -93,7 +93,7 @@ class DbHelper {
     try {
       final db = await database;
 
-      // 🔥 BUSCA EXATAMENTE PELO EMAIL E PELA SENHA JUNTOS
+      //  BUSCA EXATAMENTE PELO EMAIL E PELA SENHA JUNTOS
       final List<Map<String, dynamic>> maps = await db.query(
         'users',
         where: 'email = ? AND password = ?',

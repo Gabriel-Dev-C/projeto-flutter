@@ -42,7 +42,7 @@ void onStart(ServiceInstance service) async {
   int segundos = 0;
   Timer? timer;
 
-  // Quando você clicar no botão na Home, ele vai zerar os segundos aqui
+  
   service.on('resetTimer').listen((event) {
     segundos = 0;
   });

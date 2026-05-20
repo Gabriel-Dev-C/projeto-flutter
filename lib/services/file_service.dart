@@ -8,7 +8,7 @@ class FileService {
     return directory.path;
   }
 
-  // MODIFICADO: Agora o arquivo tem o nome do usuário (ex: log_coach_ia_Matheus.txt)
+  // Agora o arquivo tem o nome do usuário (ex: log_coach_ia_Matheus.txt)
   Future<File> _localFile(String userName) async {
     final path = await _localPath;
     // Removemos espaços ou caracteres estranhos do nome para não dar erro no arquivo
@@ -16,7 +16,7 @@ class FileService {
     return File('$path/log_coach_ia_$safeName.txt');
   }
 
-  // MODIFICADO: Adicionado parâmetro userName
+  // Adicionado parâmetro userName
   Future<void> salvarNoLog(
       String tempo, String feedback, String userName) async {
     final file = await _localFile(userName);
@@ -33,7 +33,7 @@ class FileService {
     ("✅ Upgrade registrado com sucesso para $userName.");
   }
 
-  // MODIFICADO: Adicionado parâmetro userName
+  // Adicionado parâmetro userName
   Future<String> lerHistorico(String userName) async {
     try {
       final file = await _localFile(userName);
@@ -47,7 +47,7 @@ class FileService {
     }
   }
 
-  // EXTRA: Função para deletar o log se o usuário excluir a conta
+  // Função para deletar o log se o usuário excluir a conta
   Future<void> deletarLog(String userName) async {
     final file = await _localFile(userName);
     if (await file.exists()) {

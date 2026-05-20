@@ -28,8 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // --- LÓGICA DE LOGIN COM JWT E VALIDAÇÃO LOCAL SINCRONIZADA ---
-  // --- LÓGICA DE LOGIN COM JWT E VALIDAÇÃO LOCAL SINCRONIZADA ---
+ 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -45,20 +44,20 @@ class _LoginScreenState extends State<LoginScreen> {
         senhaDigitada,
       );
 
-      // 🔥 TRAVA DE SEGURANÇA MÁXIMA CONTRA A API MOCK QUE ACEITA QUALQUER COISA:
+      // TRAVA DE SEGURANÇA MÁXIMA CONTRA A API MOCK QUE ACEITA QUALQUER COISA:
       if (emailDigitado == "eve.holt@reqres.in") {
         // Se for o e-mail da API, a senha precisa ser a correta dela
         if (senhaDigitada != "cityslick") {
           token = null;
         }
       } else {
-        // 🔥 O PULO DO GATO: Se for QUALQUER outro e-mail (ex: matheus@teste.com),
+        // O PULO DO GATO: Se for QUALQUER outro e-mail (ex: matheus@teste.com),
         // nós desconsideramos o token falso da API para forçar a validação real no SQLite!
         token = null;
       }
 
       if (token != null) {
-        // --- CASO A: SUCESSO EXCLUSIVO NA API EXTERNA ---
+        // CASO A: SUCESSO EXCLUSIVO NA API EXTERNA 
         debugPrint("---------------------------------");
         debugPrint("TOKEN JWT RECEBIDO: $token");
         debugPrint("---------------------------------");
@@ -76,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
           debugPrint("Usuário da API registrado no SQLite como: $nomeGerado");
         }
 
-        // 💾 GRAVA A SESSÃO PARA O LOGIN AUTOMÁTICO
+        //  GRAVA A SESSÃO PARA O LOGIN AUTOMÁTICO
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('user_email', emailDigitado);
 
@@ -89,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else {
-        // --- CASO B: VALIDAÇÃO REAL E RÍGIDA NO SQLITE LOCAL ---
+        //  CASO B: VALIDAÇÃO REAL E RÍGIDA NO SQLITE LOCAL 
         debugPrint("Verificando credenciais no SQLite local...");
 
         bool loginLocalSucesso = await DbHelper().checkLogin(
@@ -100,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _isLoading = false);
 
         if (loginLocalSucesso) {
-          // 💾 GRAVA A SESSÃO PARA O LOGIN AUTOMÁTICO NO LOGIN LOCAL TAMBÉM
+          // GRAVA A SESSÃO PARA O LOGIN AUTOMÁTICO NO LOGIN LOCAL TAMBÉM
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('user_email', emailDigitado);
 
@@ -112,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           }
         } else {
-          // ❌ SE NÃO PASSAR NO BANCO LOCAL, BLOQUEIA DE VERDADE!
+          // SE NÃO PASSAR NO BANCO LOCAL, BLOQUEIA DE VERDADE!
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

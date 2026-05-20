@@ -33,8 +33,7 @@ class FitStartApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
 
-      // 🔥 O PULO DO GATO: Se tiver e-mail salvo, abre direto na Home carregando ele.
-      // Se estiver vazio (null), abre a tela de Login normal.
+      
       home: (emailLogado != null && emailLogado!.isNotEmpty)
           ? HomeScreen(userEmail: emailLogado!)
           : const LoginScreen(),

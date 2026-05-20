@@ -31,7 +31,7 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
       return;
     }
 
-    // --- NOVA VALIDAÇÃO: MÍNIMO 6 CARACTERES ---
+    //  MÍNIMO 6 CARACTERES
     if (password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -47,7 +47,7 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
       return;
     }
 
-    // Objeto User e inserção no banco continuam iguais...
+    // Objeto User e inserção no banco continuam 
     User novoUsuario = User(
       name: name,
       email: email,

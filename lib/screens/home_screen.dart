@@ -13,7 +13,7 @@ import 'login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String userEmail; // Recebe o e-mail do usuário logado
+  final String userEmail; 
   const HomeScreen({super.key, required this.userEmail});
 
   @override
@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 25),
 
-            // 📸 OPÇÃO 1: CÂMERA (DIRETA E INDEPENDENTE)
+            // OPÇÃO 1: CÂMERA (DIRETA E INDEPENDENTE)
             ListTile(
               leading: const Icon(Icons.camera_alt, color: AppTheme.neonGreen),
               title: const Text("Tirar Foto (Câmera)",
@@ -89,9 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-            // 🖼️ OPÇÃO 2: GALERIA (CHAMA O SEU IMAGE_SERVICE DO JEITO QUE ELE TÁ HOJE)
-            // 📸 OPÇÃO 1: CÂMERA (DIRETA, LEVE E BLINDADA)
-            // 🖼️ OPÇÃO 2: ESCOLHER DA GALERIA (CORRIGIDO TEXTO E ÍCONE)
+      )
             ListTile(
               leading: const Icon(Icons.photo_library,
                   color: AppTheme.neonGreen), // Ícone de Galeria
@@ -123,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _listenToBackgroundService();
   }
 
-  // --- ATUALIZADO: Carrega o Nome e a Foto persistidos do SQLite de forma segura ---
+  //  Carrega o Nome e a Foto persistidos do SQLite de forma segura ---
   Future<void> _loadInitialData() async {
     try {
       final userData = await DbHelper().getUserDataByEmail(widget.userEmail);
@@ -324,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- ABA 2: PERFIL (BLINDADA CONTRA CRASHES) ---
+  // -ABA 2: PERFIL  ---
   Widget _buildProfileContent() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -333,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 20),
           Center(
             child: GestureDetector(
-              // 🔥 CORRIGIDO: Agora chama o menu flutuante em vez do service direto
+              
               onTap: _mostrarMenuFoto,
               child: Container(
                 padding: const EdgeInsets.all(4),
@@ -343,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: CircleAvatar(
                   radius: 50,
                   backgroundColor: AppTheme.cardColor,
-                  // 🔥 BLINDAGEM: Só tenta ler o arquivo se ele existir fisicamente no disco
+                  
                   backgroundImage: (_fotoPerfilPath != null &&
                           _fotoPerfilPath!.isNotEmpty &&
                           File(_fotoPerfilPath!).existsSync())
@@ -466,14 +464,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pop(ctx); // Fecha o pop-up
 
               try {
-                // 🗄️ 1. CORRIGIDO: Passando o e-mail dinâmico em vez do número 1
+                //  1. CORRIGIDO: Passando o e-mail dinâmico em vez do número 1
                 await DbHelper().deleteUser(widget.userEmail);
 
-                // 💾 2. ADICIONADO: Limpa a memória do celular para travar o login automático
+                //  2. ADICIONADO: Limpa a memória do celular para travar o login automático
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.remove('user_email');
 
-                // 🚀 3. Redireciona para a tela de login limpando o histórico
+                // 3. Redireciona para a tela de login limpando o histórico
                 if (mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -493,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- BANNER DA HOME PROTEGIDO CONTRA CRASHES ---
+  //  BANNER DA HOME PROTEGIDO CONTRA CRASHES 
   Widget _buildWelcomeBanner(int cur, int tot) {
     return Container(
       padding: const EdgeInsets.all(20),
